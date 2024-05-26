@@ -5,7 +5,7 @@ Använding av osoh22_fisj22_database_code.py:
         Ersätt password='xxxx' -> password:'local_password_on_workbench'
     
 Testning av selects och inserts:
-    Koden kör automatiskt genom en lista av tests som presenteras som utskrifter i terminalen.
+    Koden kör automatiskt genom en rad av tests som presenteras som utskrifter i terminalen.
 
     
 

@@ -187,6 +187,15 @@ def create_triggers_and_procedure(connection):
         WHERE orderID = NEW.orderID;
     END;
     """
+    create_transport_trigger = """
+    CREATE TRIGGER after_transport_insert
+    AFTER INSERT ON transport
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO orderStatusChanges (orderID, orderStatus)
+        VALUES (NEW.orderID, 'transport');
+    END;
+    """
     add_sale_procedure = """
     CREATE PROCEDURE AddSale(IN customer_id INT, IN type_id CHAR(1), IN quantity INT)
     BEGIN
@@ -217,11 +226,13 @@ def create_triggers_and_procedure(connection):
         SET FOREIGN_KEY_CHECKS = 1;
     END;
     """
+    
     execute_query(connection, create_initial_order_trigger)
     execute_query(connection, compute_sale_total_trigger)
     execute_query(connection, update_sale_total_trigger)
     execute_query(connection, create_products_after_sale_insert_trigger)
     execute_query(connection, update_order_status_after_change_trigger)
+    execute_query(connection, create_transport_trigger)
     execute_query(connection, add_sale_procedure)
     execute_query(connection, add_wipe_procedure)
 
@@ -474,15 +485,14 @@ def setup():
     create_database(connection)
     connection.close()
 
-def manual(connection):
-    """Interactive test environment for the database."""
-    def print_menu():
+def print_menu():
         print("\nSelect an option:")
         print("1. View table contents")
         print("2. Perform JOIN queries")
-        print("3. Exit")
+        print("3. Specific join queries")
+        print("4. Exit")
 
-    def print_tables_menu():
+def print_tables_menu():
         print("\nSelect a table to view:")
         print("1. customer")
         print("2. orders")
@@ -493,15 +503,22 @@ def manual(connection):
         print("7. sales")
         print("8. Back to main menu")
 
-    def print_joins_menu():
+def print_joins_menu():
         print("\nSelect a JOIN query to perform:")
         print("1. Join customers with their orders")
         print("2. Join products with their types and orders")
         print("3. Join customers with sales details")
-        print("4. Join customers with their orders for all 'pending' orders:")
-        print("5. Join the customers with their total amount of orders.")
-        print("6. Join the latest change to an order for orderID = 5.")
-        print("7. Back to main menu")
+        print("4. Back to main menu")
+
+def print_specific_joins_menu():
+        print("\nSelect a specific JOIN query to perform:")
+        print("1. Join customers with their orders for all 'pending' orders")
+        print("2. Join customers with their total amount of orders")
+        print("3. Join the latest change to an order for orderID = 5")
+        print("4. Back to main menu")
+
+def manual(connection):
+    """Interactive test environment for the database."""
 
     def fetch_table_data(table_name):
         select_query = f"SELECT * FROM {table_name};"
@@ -546,7 +563,21 @@ def manual(connection):
             columns, results = fetch_query(connection, join_query)
             print("Join customers with sales details:")
             print(f"Columns: {columns}")
-        elif option == 4:
+        else:
+            return
+
+        if columns is None or results is None:
+            print("The join query failed.")
+        elif not results:
+            print("No results found for the join query.")
+        else:
+            for row in results:
+                print(row)
+        
+        print("\n")
+    
+    def perform_specific_join_query(option):
+        if option == 1:
             join_query = """
             SELECT c.fname, c.lname, o.orderID, o.startDate, o.orderStatus
             FROM customer c
@@ -557,7 +588,7 @@ def manual(connection):
             columns, results = fetch_query(connection, join_query)
             print("Join customers with their orders for all 'pending' orders:")
             print(f"Columns: {columns}")
-        elif option == 5:
+        elif option == 2:
             join_query = """
             SELECT c.fname, c.lname, COUNT(o.orderID) as order_count
             FROM customer c
@@ -567,7 +598,7 @@ def manual(connection):
             columns, results = fetch_query(connection, join_query)
             print("Join the customers with their total amount of orders.")
             print(f"Columns: {columns}")
-        elif option == 6:
+        elif option == 3:
             join_query = """
             SELECT 
             osc.orderID, 
@@ -596,7 +627,6 @@ def manual(connection):
         else:
             for row in results:
                 print(row)
-        print("\n")
 
     while True:
         print_menu()
@@ -627,16 +657,24 @@ def manual(connection):
             while True:
                 print_joins_menu()
                 join_option = input("Enter your choice: ")
-                if join_option in ["1", "2", "3", "4", "5", "6"]:
+                if join_option in ["1", "2", "3"]:
                     perform_join_query(int(join_option))
-                elif join_option == "7":
+                elif join_option == "4":
                     break
                 else:
                     print("Invalid choice, please try again.")
         elif main_option == "3":
+            while True:
+                print_specific_joins_menu()
+                join_option = input("Enter your choice: ")
+                if join_option in ["1", "2", "3"]:
+                    perform_specific_join_query(int(join_option))
+                elif join_option == "4":
+                    break
+                else:
+                    print("Invalid choice, please try again.")
+        elif main_option == "4":
             print("Exiting the interactive test environment.")
             break
         else:
-            print("Invalid choice, please try again.")
-
             print("Invalid choice, please try again.")

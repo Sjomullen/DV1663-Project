@@ -18,7 +18,7 @@ def connect_database():
             host='localhost',
             user='root',
             password='xxxx', # your MySQL password
-            database='xxxx',  # database
+            database='testDatabase',  # database
         )
         print("Connection to DataBase successful")
     except mysql.connector.Error as e:

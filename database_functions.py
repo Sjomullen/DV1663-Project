@@ -498,7 +498,10 @@ def manual(connection):
         print("1. Join customers with their orders")
         print("2. Join products with their types and orders")
         print("3. Join customers with sales details")
-        print("4. Back to main menu")
+        print("4. Join customers with their orders for all 'pending' orders:")
+        print("5. Join the customers with their total amount of orders.")
+        print("6. Join the latest change to an order for orderID = 5.")
+        print("7. Back to main menu")
 
     def fetch_table_data(table_name):
         select_query = f"SELECT * FROM {table_name};"
@@ -581,7 +584,7 @@ def manual(connection):
             LIMIT 1;
             """
             columns, results = fetch_query(connection, join_query)
-            print("Shows the latest change to an order for orderID = 5.")
+            print("Join the latest change to an order for orderID = 5.")
             print(f"Columns: {columns}")
         else:
             return

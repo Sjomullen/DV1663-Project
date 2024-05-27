@@ -543,6 +543,46 @@ def manual(connection):
             columns, results = fetch_query(connection, join_query)
             print("Join customers with sales details:")
             print(f"Columns: {columns}")
+        elif option == 4:
+            join_query = """
+            SELECT c.fname, c.lname, o.orderID, o.startDate, o.orderStatus
+            FROM customer c
+            JOIN orders o ON c.customerID = o.customerID
+            WHERE o.orderStatus = "pending"
+            ORDER BY orderID ASC;
+            """
+            columns, results = fetch_query(connection, join_query)
+            print("Join customers with their orders for all 'pending' orders:")
+            print(f"Columns: {columns}")
+        elif option == 5:
+            join_query = """
+            SELECT c.fname, c.lname, COUNT(o.orderID) as order_count
+            FROM customer c
+            JOIN orders o ON c.customerID = o.customerID
+            GROUP BY c.customerID;
+            """
+            columns, results = fetch_query(connection, join_query)
+            print("Join the customers with their total amount of orders.")
+            print(f"Columns: {columns}")
+        elif option == 6:
+            join_query = """
+            SELECT 
+            osc.orderID, 
+            osc.orderStatus, 
+            osc.statusChangedOn AS lastStatusChangedOn, 
+            (SELECT COUNT(*) 
+             FROM orderStatusChanges 
+             WHERE orderID = osc.orderID) AS AmountOfUpdates
+            FROM orderStatusChanges osc
+            WHERE 
+                osc.orderID = 5
+            ORDER BY 
+                osc.statusChangedOn DESC 
+            LIMIT 1;
+            """
+            columns, results = fetch_query(connection, join_query)
+            print("Shows the latest change to an order for orderID = 5.")
+            print(f"Columns: {columns}")
         else:
             return
 
@@ -584,9 +624,9 @@ def manual(connection):
             while True:
                 print_joins_menu()
                 join_option = input("Enter your choice: ")
-                if join_option in ["1", "2", "3"]:
+                if join_option in ["1", "2", "3", "4", "5", "6"]:
                     perform_join_query(int(join_option))
-                elif join_option == "4":
+                elif join_option == "7":
                     break
                 else:
                     print("Invalid choice, please try again.")

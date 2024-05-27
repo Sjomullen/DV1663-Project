@@ -5,7 +5,7 @@ def create_database(connection):
     cursor = connection.cursor()
     try:
         cursor.execute("CREATE DATABASE IF NOT EXISTS testyBoy3")
-        print("Database 'testyBoy3' created successfully")
+        print("Database 'testDatabase' created successfully")
     except mysql.connector.Error as e:
         print(f"The error '{e}' occurred")
     finally:
@@ -17,8 +17,8 @@ def connect_database():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='asus456kebab14',
-            database='testyBoy3',  # database
+            password='xxxx', # your MySQL password
+            database='xxxx',  # database
         )
         print("Connection to DataBase successful")
     except mysql.connector.Error as e:
@@ -32,7 +32,7 @@ def create_connection():
         connection = mysql.connector.connect(
             host='localhost',       # or another hostname if not local
             user='root',            # your MySQL username
-            password='asus456kebab14'  # your MySQL password
+            password='xxxx'  # your MySQL password
         )
         print("Connection to MySQL DB successful")
     except mysql.connector.Error as e:
@@ -311,10 +311,13 @@ def wipe_database(connection):
     try:
         cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
         tables = ['transport', 'sales', 'orderStatusChanges', 'Product', 'productType', 'orders', 'customer']
+        
         for table in tables:
             cursor.execute(f"TRUNCATE TABLE {table};")
+        
         cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
         connection.commit()
+
         print("Database content wiped successfully")
     except mysql.connector.Error as e:
         print(f"The error '{e}' occurred")
@@ -514,7 +517,7 @@ def print_specific_joins_menu():
         print("\nSelect a specific JOIN query to perform:")
         print("1. Join customers with their orders for all 'pending' orders")
         print("2. Join customers with their total amount of orders")
-        print("3. Join the latest change to an order for orderID = 5")
+        print("3. Join orderStatusChanges with a user given orderID and get its current status.")
         print("4. Back to main menu")
 
 def manual(connection):
@@ -599,7 +602,8 @@ def manual(connection):
             print("Join the customers with their total amount of orders.")
             print(f"Columns: {columns}")
         elif option == 3:
-            join_query = """
+            orderID = input("Give an orderID: ")
+            join_query = f"""
             SELECT 
             osc.orderID, 
             osc.orderStatus, 
@@ -609,7 +613,7 @@ def manual(connection):
              WHERE orderID = osc.orderID) AS AmountOfUpdates
             FROM orderStatusChanges osc
             WHERE 
-                osc.orderID = 5
+                osc.orderID = {orderID}
             ORDER BY 
                 osc.statusChangedOn DESC 
             LIMIT 1;

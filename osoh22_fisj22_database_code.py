@@ -9,7 +9,6 @@ def main():
         df.create_triggers_and_procedure(connection)
         # Populate the tables
         df.populate_tables(connection)
-        df.sales_additions(connection)
         # run queries for the tables
         df.run_queries(connection)
         # fetch advanced queries

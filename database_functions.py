@@ -288,10 +288,6 @@ def populate_tables(connection):
     add_sale(connection, 1, 'C', 2)
     add_sale(connection, 2, 'A', 2)
 
-def sales_additions(connection):
-    add_sale(connection, 1, 'A', 3)
-    add_sale(connection, 1, 'C', 2)
-    add_sale(connection, 2, 'A', 2)
 
 def add_sale(connection, customer_id, type_id, quantity):
     """Call the AddSale procedure to add a sale."""
@@ -481,7 +477,6 @@ def reset(connection):
     create_tables(connection)
     create_triggers_and_procedure(connection)
     populate_tables(connection)
-    sales_additions(connection)
 
 def setup():
     connection = create_connection()

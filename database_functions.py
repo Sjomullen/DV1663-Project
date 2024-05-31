@@ -4,7 +4,7 @@ def create_database(connection):
     """Create a new database."""
     cursor = connection.cursor()
     try:
-        cursor.execute("CREATE DATABASE IF NOT EXISTS testyBoy3")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS testDatabase")
         print("Database 'testDatabase' created successfully")
     except mysql.connector.Error as e:
         print(f"The error '{e}' occurred")

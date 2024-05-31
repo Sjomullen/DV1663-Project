@@ -29,7 +29,7 @@ def main():
             elif word == "2":
                 df.test_tables(connection)
             elif word == '3':
-                df.drop_database(connection, 'testyBoy3')
+                df.drop_database(connection, 'testDatabase')
             elif word == '4':
                 # jump to manual testing
                 df.manual(connection)
